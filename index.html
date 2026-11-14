@@ -40,9 +40,9 @@ label.btn{padding:12px 18px;border-radius:12px;background:var(--bg);font-weight:
 <div id="tip">Aq kvadratqa tiyiń – sol jerge úy salınadı</div>
 <div class="bar" style="padding:0"><button class="alt" id="pm">✋ Jıljıtıw: óshirilgen</button><button class="alt" id="rc">🎯 Ortaǵa qaytıw</button><button class="alt" id="tmb">🕒 Haqıyqıy waqıt</button><button class="alt" id="wxb">🌦 Hawa: avto</button><button class="alt" id="shb">📸 Súwret</button></div>
 <div id="ch"><div id="chh">Atıńız hám fotońız (foto májbúriy emes)</div>
-<div class="bar"><input id="nm" maxlength="20" placeholder="Atıńız (@nik)"><label class="btn" for="ph">📷 Foto</label><input id="ph" type="file" accept="image/*" hidden><img id="pv" alt=""></div>
+<div class="bar"><input id="nm" maxlength="20" placeholder="Atıńız (@nik)"><label class="btn" for="ph">📷 Foto</label><input id="fl" type="number" min="1" max="50" value="3" title="Etaj sanı" style="width:80px"><input id="ph" type="file" accept="image/*" hidden><img id="pv" alt=""></div>
 <div>Qanday úy qurasız?</div>
-<div class="bar"><button data-t="y">Qara úy</button><button data-t="h">Apiwayı úy</button><button data-t="b">Ekewi de</button><button class="alt" id="cn">Biykar</button></div></div>
+<div class="bar"><button data-t="y">Qara úy</button><button data-t="h">Apiwayı úy</button><button data-t="b">Ekewi de</button><button data-t="c">🏗 Dizayn úy</button><button data-t="g">🏰 Katta úy</button><button data-t="m">🏢 Biznes</button><button class="alt" id="cn">Biykar</button></div></div>
 <div class="bar ed">
 <button id="add">📍 Bos orınlar</button>
 <button class="alt" id="auto">+10 úy</button>
@@ -54,7 +54,7 @@ label.btn{padding:12px 18px;border-radius:12px;background:var(--bg);font-weight:
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const $=id=>document.getElementById(id);
-const PUB=true,SITE={lvl:0,homes:[{"n":"Birinshi turǵın","t":"h","s":135},{"n":"_demegenov_t","t":"y","s":134}],start:1794649700375};let EDIT=!PUB;
+const PUB=true,SITE={lvl:0,homes:[{"n":"Birinshi turǵın","t":"h","s":135},{"n":"_demegenov_t","t":"y","s":134},{"n":"fhjxjdkd","t":"y"}],cars:[],start:1794649700375};let EDIT=!PUB;
 const R0=52,GAP=18,SP=14;
 const M=(c,o)=>new THREE.MeshLambertMaterial(Object.assign({color:c},o||{}));
 const roofs=[0xd63a3a,0x8a4b2f,0x2f3d57,0xc94b4b,0x5a3a2a].map(c=>M(c));
@@ -435,7 +435,7 @@ function life(dt,now){
   if(go){c.u+=l.d*c.v*WS*dt;if(l.d>0&&c.u>l.c0+CE)c.u-=2*CE;if(l.d<0&&c.u<l.c0-CE)c.u+=2*CE}
   const dx=l.ax?l.d:0,dz=l.ax?0:l.d;
   if(l.ax)c.g.position.set(c.u,0,l.s+l.off);else c.g.position.set(l.s+l.off,0,c.u);
-  c.g.rotation.y=Math.atan2(-dz,dx)}
+  c.g.rotation.y=Math.atan2(-dz,dx);if(c.spr)c.spr.visible=cam.position.distanceTo(c.g.position)<110}
  for(const w of WALK){const l=w.l,cr=l.ax?VS:HS;let go=true;
   if(!l.nl&&LS[1-l.ax]!=='r')for(const x of cr){const dist=(x-w.u)*w.d;if(dist>10.8&&dist<=12.8){go=false;break}}
   if(go){w.u+=w.d*w.v*WP*dt;if(w.u>l.c0+CE)w.d=-1;if(w.u<l.c0-CE)w.d=1}
@@ -477,11 +477,37 @@ function mkHouse(){
  add(2.2,.25,.8,0,.12,4.8,stepM);
  return wrap(m)}
 
+// ---- pullı úyler, biznes, katta úy ----
+const twBase=tex(64,64,x=>{x.fillStyle='#d9d2c0';x.fillRect(0,0,64,64);x.fillStyle='#35506b';x.fillRect(8,14,20,34);x.fillRect(36,14,20,34)},1,1);
+const clampF=f=>Math.max(1,Math.min(50,(f|0)||1));
+function mkTower(f){const m=new THREE.Group(),H=3.2*f,t=twBase.clone();t.needsUpdate=true;t.repeat.set(2,f);
+ const b=new THREE.Mesh(new THREE.BoxGeometry(7,H,5.5),M(0xffffff,{map:t}));b.position.y=H/2;m.add(b);
+ if(f<=3){const r=new THREE.Mesh(new THREE.ConeGeometry(1,1,4).rotateY(Math.PI/4),hRoof);r.scale.set(5.8,3,4.8);r.position.y=H+1.5;m.add(r)}
+ else{const q=new THREE.Mesh(new THREE.BoxGeometry(7.4,.5,5.9),white);q.position.y=H+.25;m.add(q);
+  if(f>=15){const a=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,6,6),M(0xaa2222));a.position.y=H+3.5;m.add(a)}}
+ const d=new THREE.Mesh(new THREE.BoxGeometry(1.4,2.2,.2),doorM);d.position.set(0,1.1,2.8);m.add(d);return wrap(m)}
+function mkMall(txt){const m=new THREE.Group();
+ const add=(w,h,d,x,y,z,mat)=>{const q=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);q.position.set(x,y,z);m.add(q)};
+ add(13,6,8,0,3,0,M(0xe8e4da));add(13.4,.5,8.4,0,6.25,0,white);add(11,3.2,.2,0,2.2,4.05,glass);add(2.4,2.6,.25,0,1.3,4.1,doorM);
+ const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d');x.fillStyle='#c0392b';x.fillRect(0,0,256,64);
+ x.fillStyle='#fff';x.font='bold 36px system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText((txt||'SAWDA ORAYI').slice(0,16).toUpperCase(),128,34,240);
+ const s=new THREE.Mesh(new THREE.PlaneGeometry(9,2.2),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c)}));s.position.set(0,5,4.12);m.add(s);return wrap(m)}
+function mkMansion(){const m=new THREE.Group(),cr=M(0xf1e8d4);
+ const add=(w,h,d,x,y,z,mat)=>{const q=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);q.position.set(x,y,z);m.add(q)};
+ add(10,4,6.5,0,2,0,cr);add(7,3.2,5,0,5.6,0,cr);
+ const r1=new THREE.Mesh(new THREE.ConeGeometry(1,1,4).rotateY(Math.PI/4),hRoof);r1.scale.set(9.2,2.6,7.2);r1.position.y=5.3;m.add(r1);
+ const r2=new THREE.Mesh(new THREE.ConeGeometry(1,1,4).rotateY(Math.PI/4),roofs[0]);r2.scale.set(7.2,2.4,5.6);r2.position.y=8.4;m.add(r2);
+ add(10.4,.3,2.2,0,3.9,4.2,white);for(const x of[-4,-1.5,1.5,4])add(.4,3.7,.4,x,1.9,5,white);
+ add(1.6,2.4,.1,0,1.2,3.3,doorM);for(const x of[-3.4,3.4])add(1.8,1.6,.1,x,2,3.28,glass);for(const x of[-1.8,1.8])add(1.4,1.2,.1,x,5.8,2.55,glass);
+ add(3,.25,1,0,.12,5.6,stepM);return wrap(m)}
+
 // ---- homes ----
 const N0=PLOTS.length;let NV=PUB;if(!PUB)try{NV=localStorage.getItem('qalaRd')==='1';localStorage.setItem('qalaRd','1')}catch(e){}
 try{const L=PUB?SITE.lvl:(+localStorage.getItem('qalaLvl')||0);for(let i=0;i<Math.min(L,4);i++)expand(true)}catch(e){}
+function autoSlots(a){const used=new Set(a.filter(h=>Number.isInteger(h.s)).map(h=>h.s));
+ a.forEach(h=>{if(Number.isInteger(h.s))return;let b=-1,bd=1e9;PLOTS.forEach((p,i)=>{if(used.has(i))return;const d=(p[0]-MX)**2+(p[1]-MZ)**2;if(d<bd){bd=d;b=i}});if(b>=0){h.s=b;used.add(b)}})}
 let homes=[{n:'Birinshi turǵın',t:'h',c:0,s:freeNear(MX+28,MZ+28)}];
-try{const s=PUB?SITE.homes:JSON.parse(localStorage.getItem('qalaHotel')||'null');if(Array.isArray(s)){const f=s.filter(h=>Number.isInteger(h.s)&&h.s>=0&&h.s<PLOTS.length&&(NV||h.s<N0));if(f.length)homes=f}}catch(e){}
+try{const s=PUB?SITE.homes:JSON.parse(localStorage.getItem('qalaHotel')||'null');if(Array.isArray(s)){autoSlots(s);const f=s.filter(h=>Number.isInteger(h.s)&&h.s>=0&&h.s<PLOTS.length&&(NV||h.s<N0));if(f.length)homes=f}}catch(e){}
 const save=()=>{if(PUB)return;try{localStorage.setItem('qalaHotel',JSON.stringify(homes))}catch(e){}};
 if(!NV)save();
 let meshes=[],houseObjs=[];
@@ -490,14 +516,21 @@ function spawn(i,delay){
  const h=homes[i],p=posOf(h.s),g=new THREE.Group();taken.add(h.s);hideMark(h.s);
  const core=new THREE.Group();g.add(core);
  if(h.t==='b'){const a=mkYurt(),b=mkHouse();a.position.z=-4.4;b.position.z=4.4;core.add(a,b);core.scale.setScalar(.8)}
- else core.add(h.t==='y'?mkYurt():mkHouse());
- g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.userData.n=h.n;o.userData.h=h;o.userData.g=g;meshes.push(o)}});
+ else core.add(h.t==='y'?mkYurt():h.t==='c'?mkTower(clampF(h.f)):h.t==='m'?mkMall(h.d):h.t==='g'?mkMansion():mkHouse());
+ const yy=h.t==='c'?clampF(h.f)*3.2+5:h.t==='m'?10:h.t==='g'?13:10,info={c:clampF(h.f)+' etajlı úy',m:'Biznes / sawda orayı',g:'Katta úy'}[h.t]||'';
+ g.traverse(o=>{if(o.isMesh){o.castShadow=true;o.userData.n=h.n;o.userData.h=h;o.userData.g=g;o.userData.y=yy;o.userData.i=info;meshes.push(o)}});
  g.position.set(p.x,0,p.z);g.rotation.y=p.r!==undefined?p.r:Math.atan2(MZ-p.z,-(MX-p.x));g.scale.setScalar(.001);
- const spr=nickSprite(h.n);spr.position.y=10;g.add(spr);houseObjs.push({g,t:-delay,s:spr});scene.add(g);addWalker(h,p.x,p.z);
+ const spr=nickSprite(h.n);spr.position.y=yy;g.add(spr);houseObjs.push({g,t:-delay,s:spr});scene.add(g);if(h.t!=='m')addWalker(h,p.x,p.z);
 }
 function stats(){unlockLM();if(EDIT&&taken.size>=PLOTS.length&&LVL<4)expand();$('pop').textContent=homes.length;$('day').textContent=dayNo()}
 const mk=(n,t,s)=>({n,t:t||['y','h','b'][Math.floor(Math.random()*3)],c:0,s});
 homes.forEach((h,i)=>spawn(i,Math.min(i*.03,1.5)));stats();
+const OC={c1:['Chevrolet Spark',0xe8c32a,.85],c2:['UzAuto Damas',0xf2f2f2,.9],c3:['Chevrolet Cobalt',0x8a8f99,1],c4:['Chevrolet Gentra',0x222428,1],c5:['Chevrolet Tracker',0xd63a3a,1.05],c6:['Chevrolet Equinox',0x2f5fbf,1.1],c7:['BMW M5 F90',0x1b2a4a,1.15],c8:['Mercedes-Benz G63',0x2b2f3a,1.2],c9:['Porsche 911 Turbo S',0xf5b400,1.1],c10:['Lamborghini Urus',0x3a8f3a,1.2]};
+(SITE.cars||[]).forEach((o,i)=>{const m=OC[o.k];if(!m||!o.n)return;const g=mkCar(),l=LN[(i*3+1)%LN.length];
+ g.children[0].material=M(m[1]);g.scale.setScalar(m[2]);const spr=nickSprite(o.n);g.add(spr);
+ const hit=new THREE.Mesh(new THREE.BoxGeometry(6,3.5,3),new THREE.MeshBasicMaterial({visible:false}));hit.position.y=1.6;
+ hit.userData={n:o.n,g,h:{},y:5,mv:1,car:1,i:m[0]};g.add(hit);base.push(hit);
+ CARS.push({g,l,u:l.c0-CE+((i*71+13)%(2*CE)),v:8+m[2]*3,spr})});
 let photo='',selSlot=-1;
 $('add').onclick=()=>{flash=performance.now()+2500;$('tip').textContent='Kartadaǵı aq kvadratqa tiyiń – sol jerge úy salınadı'};
 $('cn').onclick=()=>{$('ch').classList.remove('on');selSlot=-1;selMark.visible=false};
@@ -507,7 +540,7 @@ $('ph').onchange=e=>{const f=e.target.files[0];photo='';$('pv').style.display='n
   x.drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,96,96);photo=c.toDataURL('image/jpeg',.75);
   $('pv').src=photo;$('pv').style.display='inline-block';URL.revokeObjectURL(u)};im.src=u};
 document.querySelectorAll('#ch button[data-t]').forEach(b=>b.onclick=()=>{
- if(selSlot<0)return;const h=mk($('nm').value.trim()||'Atsız turǵın',b.dataset.t,selSlot);if(photo)h.p=photo;homes.push(h);selSlot=-1;selMark.visible=false;
+ if(selSlot<0)return;const h=mk($('nm').value.trim()||'Atsız turǵın',b.dataset.t,selSlot);if(photo)h.p=photo;if(h.t==='c')h.f=clampF(+$('fl').value||3);homes.push(h);selSlot=-1;selMark.visible=false;
  $('nm').value='';photo='';$('ph').value='';$('pv').style.display='none';$('ch').classList.remove('on');
  save();spawn(homes.length-1,0);stats();$('tip').textContent='Úyińiz qalaǵa qosıldı!'});
 $('nm').addEventListener('keydown',e=>{if(e.key==='Enter')$('add').click()});
@@ -531,7 +564,7 @@ function pick(e){const r=cv.getBoundingClientRect();
  mv.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(mv,cam);
  const h=ray.intersectObjects(base.concat(meshes),false)[0];
  const u=h&&h.object.userData;
- if(u&&u.n){$('tip').textContent=(u.m?'🏛 ':u.mv?'🚶 ':'🏠 ')+u.n+(u.i?' – '+u.i:'');
+ if(u&&u.n){$('tip').textContent=(u.m?'🏛 ':u.car?'🚗 ':u.mv?'🚶 ':'🏠 ')+u.n+(u.i?' – '+u.i:'');
   sel=u.m?{x:MX,y:26,z:MZ,n:u.n}:{x:u.g.position.x,y:u.y||12,z:u.g.position.z,n:u.n,p:u.h.p,g:u.mv?u.g:null};
   $('ln').textContent=sel.n;const lp=$('lp');if(sel.p){lp.src=sel.p;lp.style.display='block'}else lp.style.display='none';
   $('lab').style.display='flex'}
@@ -596,7 +629,7 @@ $('sb').onclick=doSearch;
 function setEdit(on){EDIT=on;document.querySelectorAll('.ed').forEach(e=>e.style.display=on?'':'none');marks.visible=on;
  if(!on){$('ch').classList.remove('on');selMark.visible=false;$('sub').textContent='Bir barmaq – aylandırıw · Eki barmaq – jıljıtıw hám jaqınlatıw · Nikińizdi izlep úyińizdi tabıń';$('tip').textContent='🔍 Joqarıdaǵı izlew maydanına nikińizdi jazıń'}
  else if(PUB)$('tip').textContent='✏️ Redaktor rejimi: úy qosıń, soń 📋 JSON túymesin basıp maǵan jiberiń'}
-$('ex').onclick=async()=>{const j=JSON.stringify({lvl:LVL,homes:homes.map(h=>({n:h.n,t:h.t,s:h.s,p:h.p}))});
+$('ex').onclick=async()=>{const j=JSON.stringify({lvl:LVL,homes:homes.map(h=>({n:h.n,t:h.t,s:h.s,p:h.p,f:h.f,d:h.d})),cars:SITE.cars||[]});
  try{await navigator.clipboard.writeText(j);$('tip').textContent='📋 JSON kóshirildi – maǵan jiberiń'}catch(e){const x=$('jx');x.style.display='block';x.value=j;x.focus();x.select();$('tip').textContent='JSON-dı belgilep kóshirip alıń'}};
 if(PUB){setEdit(false);try{claude.use('user').then(u=>{if(u&&u.isOwner())setEdit(true)}).catch(()=>{})}catch(e){}}
 $('sq').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch()});
